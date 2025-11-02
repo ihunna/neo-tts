@@ -1,0 +1,106 @@
+timestamp,model,speaker,text,duration,output_path
+2025-11-01 05:43:06,kokoro,am_santa,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.62,static/output/kokoro_1761972185.wav
+2025-11-01 05:51:54,kokoro,am_santa,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.62,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972704.wav
+2025-11-01 05:52:45,kokoro,zm_yunyang,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.33,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972764.wav
+2025-11-01 05:52:57,kokoro,af_sarah,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.70,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972775.wav
+2025-11-01 05:53:11,kokoro,if_sara,"""My heart breaks into a million pieces, I can't believe they're gone.""",3.90,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972790.wav
+2025-11-01 05:53:34,kokoro,af_bella,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.80,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972813.wav
+2025-11-01 05:53:57,kokoro,af_bella,"""My heart breaks into a million pieces, I can't believe they're gone.""",4.80,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972836.wav
+2025-11-01 05:54:49,kokoro,af_bella,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",6.17,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761972887.wav
+2025-11-01 05:59:19,kokoro,af_alloy,"Hello, this is a test of GPU monitoring.",3.80,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973150.wav
+2025-11-01 06:00:57,kokoro,af_alloy,GPU monitoring is working perfectly.,3.65,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973248.wav
+2025-11-01 06:03:20,kokoro,af_sarah,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",7.25,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973398.wav
+2025-11-01 06:07:45,kokoro,af_sarah,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",30.18,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973649.wav
+2025-11-01 06:08:02,kokoro,af_sarah,"This is the first line.
+This is the second line.
+This is the third line.",7.38,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973680.wav
+2025-11-01 06:08:46,kokoro,af_sarah,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",30.18,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973718.wav
+2025-11-01 06:09:50,kokoro,af_sarah,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",29.65,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973781.wav
+2025-11-01 06:10:38,kokoro,af_sarah,"1: Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",29.68,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973831.wav
+2025-11-01 06:10:58,kokoro,af_sarah,"1, Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",29.73,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973850.wav
+2025-11-01 06:12:00,kokoro,am_santa,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",29.05,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973912.wav
+2025-11-01 06:12:49,kokoro,zm_yunjian,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",27.77,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973961.wav
+2025-11-01 06:13:14,kokoro,zm_yunjian,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",27.77,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761973987.wav
+2025-11-01 06:13:53,kokoro,am_echo,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",27.90,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974025.wav
+2025-11-01 06:14:36,kokoro,if_sara,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",24.05,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974070.wav
+2025-11-01 06:15:12,kokoro,am_eric,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",24.93,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974106.wav
+2025-11-01 06:15:50,kokoro,bf_isabella,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",28.12,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974142.wav
+2025-11-01 06:16:30,kokoro,af_sky,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",27.73,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974182.wav
+2025-11-01 06:18:22,kokoro,af_river,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",25.38,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974295.wav
+2025-11-01 06:19:03,kokoro,af_heart,"1. Hello there! This is a simple clarity test for my local TTS system.  
+2. Testing one, two, three ...",28.00,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974335.wav
+2025-11-01 06:19:52,kokoro,af_heart,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",23.30,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974386.wav
+2025-11-01 06:20:25,kokoro,af_heart,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",23.30,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974419.wav
+2025-11-01 06:20:58,kokoro,af_bella,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",25.07,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974451.wav
+2025-11-01 06:24:55,kokoro,am_michael,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",25.80,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974688.wav
+2025-11-01 06:27:11,kokoro,am_fenrir,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",22.82,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974825.wav
+2025-11-01 06:28:09,kokoro,am_fenrir,"1. You know, sometimes I just like to pause... and think about how amazing technology has become.  
+...",22.82,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974883.wav
+2025-11-01 06:29:32,kokoro,am_fenrir,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.98,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761974964.wav
+2025-11-01 06:30:23,kokoro,am_michael,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",32.48,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975015.wav
+2025-11-01 06:31:18,kokoro,af_jessica,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",25.27,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975071.wav
+2025-11-01 06:31:54,kokoro,hf_alpha,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",31.20,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975105.wav
+2025-11-01 06:33:05,kokoro,hm_omega,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",31.90,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975176.wav
+2025-11-01 06:34:11,kokoro,am_puck,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.77,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975243.wav
+2025-11-01 06:34:57,kokoro,am_liam,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",26.57,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975290.wav
+2025-11-01 06:36:31,kokoro,zf_xiaoxiao,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",27.15,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975384.wav
+2025-11-01 06:37:06,kokoro,af_heart,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",29.18,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975418.wav
+2025-11-01 06:38:03,kokoro,af_bella,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",31.50,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761975475.wav
+2025-11-01 13:15:08,kokoro,af_bella,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",31.50,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999300.wav
+2025-11-01 13:16:28,kokoro,af_heart,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",29.18,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999380.wav
+2025-11-01 13:17:22,kokoro,af_heart,"1. Bonjour! Je m’appelle Chatterbox, enchanté de faire votre connaissance.  
+2. Hola, ¿cómo estás ho...",45.62,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999429.wav
+2025-11-01 13:18:23,kokoro,zf_xiaoxiao,こんにちは。私はローカル音声モデルのテストをしています。,19.40,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999498.wav
+2025-11-01 13:19:04,kokoro,zf_xiaoni,こんにちは。私はローカル音声モデルのテストをしています。,21.02,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999537.wav
+2025-11-01 13:19:38,kokoro,zf_xiaoni,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.98,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999570.wav
+2025-11-01 13:20:14,kokoro,em_santa,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",24.48,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999608.wav
+2025-11-01 13:20:53,kokoro,em_alex,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",24.18,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999646.wav
+2025-11-01 13:21:29,kokoro,bf_lily,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.12,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999681.wav
+2025-11-01 13:24:23,kokoro,am_echo,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.57,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1761999855.wav
+2025-11-02 03:16:12,kokoro,🇺🇸 Bella 🚺🔥 (A-),"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",31.50,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762049764.wav
+2025-11-02 04:13:59,zonos,rec_1762000875.wav,"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",4.64,/Users/user/Desktop/local-tts-devlopment/app/static/output/zonos_1762053136.wav
+2025-11-02 04:30:21,kokoro,🇺🇸 Echo 🚹 (D),"Once upon a time, in a quiet workshop, a curious developer built a voice that could talk, sing, and ...",28.57,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054213.wav
+2025-11-02 04:34:02,kokoro,🇺🇸 Echo 🚹 (D),He {verb} {adverb} when he saw the {adjective} {noun}.,4.00,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054441.wav
+2025-11-02 04:37:37,kokoro,🇺🇸 Sarah 🚺 (C+),The beautiful energy nurture delightfully in the zenith. I travel to explore the charming universe w...,14.10,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054653.wav
+2025-11-02 04:39:32,kokoro,🇺🇸 River 🚺 (D),"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",54.95,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054757.wav
+2025-11-02 04:41:32,kokoro,🇺🇸 Onyx 🚹 (D),"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",59.27,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054876.wav
+2025-11-02 04:42:52,kokoro,🇺🇸 Heart 🚺❤️ (A),"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",65.03,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762054954.wav
+2025-11-02 04:44:18,kokoro,🇬🇧 George 🚹 (C),"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",68.97,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762055040.wav
+2025-11-02 04:45:50,kokoro,🇬🇧 Fable 🚹 (C),"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",58.35,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762055134.wav
+2025-11-02 04:47:04,kokoro,🇧🇷 Alex 🚹,"Journey to the beautiful knowledge
+
+Jordan had always been a dreamer, spending countless hours gazin...",54.75,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762055210.wav
+2025-11-02 04:48:16,kokoro,🇧🇷 Alex 🚹,"Journey to the beautiful knowledge.
+
+Jordan had always been a dreamer, spending countless hours gazi...",54.80,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762055282.wav
+2025-11-02 04:48:45,kokoro,🇺🇸 Heart 🚺❤️ (A),"Journey to the beautiful knowledge.
+
+Jordan had always been a dreamer, spending countless hours gazi...",65.12,/Users/user/Desktop/local-tts-devlopment/app/static/output/kokoro_1762055307.wav

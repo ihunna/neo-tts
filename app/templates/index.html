@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neo TTS - Modern Modular Text-to-Speech</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .audio-player { width: 100%; max-width: 400px; }
+    .model-card { transition: all 0.2s; }
+    .model-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .voice-upload { display: none; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-2">🗣️ Neo TTS</h1>
+      <p class="text-gray-600">Modern Modular Text-to-Speech System</p>
+    </header>
+
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Model Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select Model</label>
+          <select id="modelSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">Choose a model...</option>
+            {% for model_id, model in models.items() %}
+            <option value="{{ model_id }}" data-description="{{ model.description }}" data-requires-reference="{{ model.get('requires_reference', False) }}">
+              {{ model.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <p id="modelDescription" class="text-sm text-gray-500 mt-2"></p>
+        </div>
+
+        <!-- Voice Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select Voice</label>
+          <select id="voiceSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" disabled>
+            <option value="">Select a model first...</option>
+          </select>
+
+          <!-- Voice Preview Player -->
+          <div id="voicePreview" class="mt-2 hidden">
+            <div class="flex items-center space-x-2 p-2 bg-blue-50 rounded-lg border">
+              <button id="previewPlayBtn" class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <span id="previewPlayIcon">▶️</span>
+              </button>
+              <div class="flex-1">
+                <div class="text-sm text-blue-800 font-medium">Preview Voice Sample</div>
+                <div class="text-xs text-blue-600">Click play to hear this voice</div>
+              </div>
+            </div>
+            <audio id="previewAudio" class="hidden"></audio>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference Audio Upload/Record (for Zonos) -->
+      <div id="referenceUpload" class="mt-4 voice-upload">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Reference Audio (for voice cloning)</label>
+
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-200 mb-4">
+          <button id="uploadTab" class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50 rounded-t-lg">
+            📁 Upload File
+          </button>
+          <button id="recordTab" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
+            🎤 Record Voice
+          </button>
+        </div>
+
+        <!-- Upload Tab Content -->
+        <div id="uploadContent" class="tab-content">
+          <input type="file" id="referenceFile" accept=".wav,.mp3,.m4a,.flac" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <p class="text-sm text-gray-500 mt-1">Upload a short audio sample (WAV, MP3, M4A, or FLAC) of the voice you want to clone</p>
+        </div>
+
+        <!-- Record Tab Content -->
+        <div id="recordContent" class="tab-content hidden">
+          <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <h4 class="text-sm font-medium text-blue-800 mb-2">📖 Recording Text</h4>
+            <p id="recordingText" class="text-blue-700 text-lg leading-relaxed">
+              "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once."
+            </p>
+          </div>
+
+          <div class="flex items-center space-x-3 mb-4">
+            <button id="recordBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
+              <span id="recordIcon">⏺️</span>
+              <span id="recordText">Start Recording</span>
+            </button>
+            <button id="playBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden flex items-center space-x-2">
+              <span>▶️</span>
+              <span>Play Recording</span>
+            </button>
+            <button id="uploadRecordingBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors hidden flex items-center space-x-2">
+              <span>⬆️</span>
+              <span>Upload Recording</span>
+            </button>
+            <button id="retryBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors hidden">
+              🔄 Retry
+            </button>
+          </div>
+
+          <div id="recordingStatus" class="text-sm text-gray-600 mb-2 hidden">
+            <span id="statusText">Ready to record</span>
+            <span id="durationText" class="ml-2"></span>
+          </div>
+
+          <div id="recordingWaveform" class="bg-gray-100 h-16 rounded-lg mb-2 hidden flex items-center justify-center">
+            <div class="flex items-end space-x-1" id="waveformBars"></div>
+          </div>
+
+          <audio id="recordedAudio" controls class="w-full hidden"></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text Input -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Enter Text</label>
+      <textarea id="textInput" rows="4" placeholder="Type the text you want to convert to speech..."
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"></textarea>
+      <div class="flex justify-between items-center mt-2">
+        <span id="charCount" class="text-sm text-gray-500">0 characters</span>
+        <div class="flex items-center space-x-2">
+          <select id="textTypeSelect" class="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="sentence">📝 Sentence</option>
+            <option value="paragraph">📄 Paragraph</option>
+            <option value="dialog">💬 Dialog</option>
+            <option value="story">📖 Short Story</option>
+          </select>
+          <button id="randomTextBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            🎲 Random Text
+          </button>
+          <button id="generateBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+            🎵 Generate Audio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio Player -->
+    <div id="audioSection" class="bg-white rounded-lg shadow-lg p-6" style="display: none;">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">Generated Audio</h3>
+      <audio id="audioPlayer" controls class="audio-player mb-4"></audio>
+      <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+        <div>
+          <span id="generationInfo"></span><br>
+          <span id="performanceInfo"></span>
+        </div>
+        <div id="gpuInfo" class="text-right"></div>
+      </div>
+      <div class="flex items-center justify-between">
+        <a id="downloadLink" href="#" download class="text-blue-600 hover:text-blue-800">📥 Download</a>
+        <button id="deviceInfoBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+          🔧 Device Info
+        </button>
+      </div>
+    </div>
+
+    <!-- Device Information Modal -->
+    <div id="deviceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">🖥️ Device Information</h3>
+              <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="deviceDetails" class="space-y-4">
+              <div class="animate-pulse text-center text-gray-500">Loading device information...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Generations -->
+    <div id="recentSection" class="bg-white rounded-lg shadow-lg p-6 mt-6" style="display: none;">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Generations</h3>
+      <div id="recentList" class="space-y-2"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  </div>
+
+  <script>
+    // DOM elements
+    const modelSelect = document.getElementById('modelSelect');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const referenceUpload = document.getElementById('referenceUpload');
+    const referenceFile = document.getElementById('referenceFile');
+    const textInput = document.getElementById('textInput');
+    const charCount = document.getElementById('charCount');
+    const textTypeSelect = document.getElementById('textTypeSelect');
+    const randomTextBtn = document.getElementById('randomTextBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const audioSection = document.getElementById('audioSection');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const generationInfo = document.getElementById('generationInfo');
+    const performanceInfo = document.getElementById('performanceInfo');
+    const gpuInfo = document.getElementById('gpuInfo');
+    const downloadLink = document.getElementById('downloadLink');
+    const modelDescription = document.getElementById('modelDescription');
+    const deviceInfoBtn = document.getElementById('deviceInfoBtn');
+    const deviceModal = document.getElementById('deviceModal');
+    const closeModal = document.getElementById('closeModal');
+    const deviceDetails = document.getElementById('deviceDetails');
+
+    // Voice preview elements
+    const voicePreview = document.getElementById('voicePreview');
+    const previewPlayBtn = document.getElementById('previewPlayBtn');
+    const previewPlayIcon = document.getElementById('previewPlayIcon');
+    const previewAudio = document.getElementById('previewAudio');
+
+    let uploadedReferenceFile = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedBlob = null;
+    let recordingStartTime = null;
+    let waveformInterval = null;
+
+    // Toast notification system
+    const toastContainer = document.getElementById('toastContainer');
+
+    function showToast(message, type = 'info', duration = 4000) {
+      const toast = document.createElement('div');
+      toast.className = `p-4 rounded-lg shadow-lg max-w-sm animate-fade-in ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        type === 'warning' ? 'bg-yellow-500 text-white' :
+        'bg-blue-500 text-white'
+      }`;
+
+      toast.innerHTML = `
+        <div class="flex items-center">
+          <span class="flex-1">${message}</span>
+          <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+      `;
+
+      toastContainer.appendChild(toast);
+
+      // Auto remove after duration
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, duration);
+
+      return toast;
+    }
+
+    // Tab switching functionality
+    const uploadTab = document.getElementById('uploadTab');
+    const recordTab = document.getElementById('recordTab');
+    const uploadContent = document.getElementById('uploadContent');
+    const recordContent = document.getElementById('recordContent');
+
+    uploadTab.addEventListener('click', function() {
+      uploadTab.className = 'px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50 rounded-t-lg';
+      recordTab.className = 'px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent';
+      uploadContent.classList.remove('hidden');
+      recordContent.classList.add('hidden');
+    });
+
+    recordTab.addEventListener('click', function() {
+      recordTab.className = 'px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50 rounded-t-lg';
+      uploadTab.className = 'px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent';
+      recordContent.classList.remove('hidden');
+      uploadContent.classList.add('hidden');
+    });
+
+    // Recording functionality
+    const recordBtn = document.getElementById('recordBtn');
+    const playBtn = document.getElementById('playBtn');
+    const uploadRecordingBtn = document.getElementById('uploadRecordingBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const recordIcon = document.getElementById('recordIcon');
+    const recordText = document.getElementById('recordText');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const statusText = document.getElementById('statusText');
+    const durationText = document.getElementById('durationText');
+    const recordingWaveform = document.getElementById('recordingWaveform');
+    const waveformBars = document.getElementById('waveformBars');
+    const recordedAudio = document.getElementById('recordedAudio');
+
+    let isRecording = false;
+
+    recordBtn.addEventListener('click', async function() {
+      if (!isRecording) {
+        await startRecording();
+      } else {
+        stopRecording();
+      }
+    });
+
+    playBtn.addEventListener('click', function() {
+      if (recordedBlob) {
+        recordedAudio.src = URL.createObjectURL(recordedBlob);
+        recordedAudio.classList.remove('hidden');
+        recordedAudio.play();
+      }
+    });
+
+    uploadRecordingBtn.addEventListener('click', uploadRecordedAudio);
+
+    retryBtn.addEventListener('click', function() {
+      resetRecording();
+    });
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          stream.getTracks().forEach(track => track.stop());
+          stopWaveformAnimation();
+          updateRecordingUI('stopped');
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        recordingStartTime = Date.now();
+        updateRecordingUI('recording');
+        startWaveformAnimation();
+
+      } catch (error) {
+        console.error('Recording failed:', error);
+        showToast('Failed to start recording. Please check microphone permissions.', 'error');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+      }
+    }
+
+    function resetRecording() {
+      recordedBlob = null;
+      recordedAudio.classList.add('hidden');
+      recordedAudio.src = '';
+      updateRecordingUI('ready');
+    }
+
+    function updateRecordingUI(state) {
+      switch (state) {
+        case 'recording':
+          recordIcon.textContent = '⏹️';
+          recordText.textContent = 'Stop Recording';
+          recordBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+          recordBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+          recordingStatus.classList.remove('hidden');
+          recordingWaveform.classList.remove('hidden');
+          statusText.textContent = 'Recording...';
+          playBtn.classList.add('hidden');
+          uploadRecordingBtn.classList.add('hidden');
+          retryBtn.classList.add('hidden');
+          break;
+        case 'stopped':
+          recordIcon.textContent = '⏺️';
+          recordText.textContent = 'Start Recording';
+          recordBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+          recordBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+          statusText.textContent = 'Recording complete';
+          playBtn.classList.remove('hidden');
+          uploadRecordingBtn.classList.remove('hidden');
+          retryBtn.classList.remove('hidden');
+          break;
+        case 'ready':
+          recordIcon.textContent = '⏺️';
+          recordText.textContent = 'Start Recording';
+          recordBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+          recordBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+          recordingStatus.classList.add('hidden');
+          recordingWaveform.classList.add('hidden');
+          durationText.textContent = '';
+          statusText.textContent = 'Ready to record';
+          playBtn.classList.add('hidden');
+          uploadRecordingBtn.classList.add('hidden');
+          retryBtn.classList.add('hidden');
+          break;
+      }
+    }
+
+    function startWaveformAnimation() {
+      waveformBars.innerHTML = '';
+      for (let i = 0; i < 20; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'bg-blue-500 w-1 rounded-full transition-all duration-100';
+        bar.style.height = '4px';
+        waveformBars.appendChild(bar);
+      }
+
+      waveformInterval = setInterval(() => {
+        const bars = waveformBars.children;
+        for (let i = 0; i < bars.length; i++) {
+          const height = Math.random() * 40 + 4;
+          bars[i].style.height = height + 'px';
+        }
+      }, 100);
+    }
+
+    function stopWaveformAnimation() {
+      if (waveformInterval) {
+        clearInterval(waveformInterval);
+        waveformInterval = null;
+      }
+    }
+
+    // Update recording duration
+    setInterval(() => {
+      if (isRecording && recordingStartTime) {
+        const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+        const minutes = Math.floor(duration / 60);
+        const seconds = duration % 60;
+        durationText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }
+    }, 1000);
+
+    // Update model description
+    modelSelect.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      const description = selectedOption.getAttribute('data-description');
+      const requiresReference = selectedOption.getAttribute('data-requires-reference') === 'true' ||
+                               selectedOption.getAttribute('data-requires-reference') === 'True';
+
+      modelDescription.textContent = description || '';
+
+      // Don't show upload UI by default for models requiring reference
+      // Upload UI will be shown when user selects "upload_reference" from voices dropdown
+      referenceUpload.style.display = 'none';
+      referenceFile.value = '';
+      uploadedReferenceFile = null;
+
+      loadVoices();
+    });
+
+    // Load voices for selected model
+    async function loadVoices(modelName = null, selectedVoice = null) {
+      const targetModel = modelName || modelSelect.value;
+      if (!targetModel) {
+        voiceSelect.innerHTML = '<option value="">Select a model first...</option>';
+        voiceSelect.disabled = true;
+        return;
+      }
+
+      voiceSelect.disabled = true;
+      voiceSelect.innerHTML = '<option value="">Loading voices...</option>';
+
+      try {
+        const response = await fetch(`/api/voices/${targetModel}`);
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (data.voices && data.voices.length > 0) {
+          voiceSelect.innerHTML = '<option value="">Choose a voice...</option>';
+          data.voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice;
+            if (voice === 'upload_reference') {
+              option.textContent = '➕ Upload New Voice';
+            } else {
+              option.textContent = `🎤 ${voice}`;
+            }
+            voiceSelect.appendChild(option);
+          });
+        } else {
+          // No saved voices - show message and ensure upload UI is visible
+          voiceSelect.innerHTML = '<option value="">Upload a voice below to get started</option>';
+        }
+
+        voiceSelect.disabled = false;
+
+        // Auto-select the specified voice if provided
+        if (selectedVoice) {
+          voiceSelect.value = selectedVoice;
+          // Trigger the change event to update UI
+          voiceSelect.dispatchEvent(new Event('change'));
+        }
+      } catch (error) {
+        console.error('Failed to load voices:', error);
+        voiceSelect.innerHTML = '<option value="">Failed to load voices</option>';
+      }
+    }
+
+    // Handle voice selection changes
+    voiceSelect.addEventListener('change', function() {
+      const selectedVoice = this.value;
+      const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+      const requiresReference = selectedOption.getAttribute('data-requires-reference') === 'true' ||
+                               selectedOption.getAttribute('data-requires-reference') === 'True';
+
+      if (requiresReference) {
+        if (selectedVoice === 'upload_reference') {
+          // Show upload interface for new voices
+          referenceUpload.style.display = 'block';
+          uploadedReferenceFile = null;
+          voicePreview.classList.add('hidden');
+        } else if (selectedVoice && selectedVoice.endsWith('.wav')) {
+          // Hide upload interface for saved voices and set the reference file
+          referenceUpload.style.display = 'none';
+          uploadedReferenceFile = selectedVoice;
+          referenceFile.value = '';
+          resetRecording();
+          // Show voice preview for saved voices
+          voicePreview.classList.remove('hidden');
+          previewAudio.src = `/static/uploads/${selectedVoice}`;
+        } else {
+          // No valid voice selected
+          referenceUpload.style.display = 'none';
+          uploadedReferenceFile = null;
+          voicePreview.classList.add('hidden');
+        }
+      } else {
+        // For models that don't require reference, hide preview
+        voicePreview.classList.add('hidden');
+      }
+    });
+
+    // Voice preview play button
+    previewPlayBtn.addEventListener('click', function() {
+      if (previewAudio.paused) {
+        previewAudio.play();
+        previewPlayIcon.textContent = '⏸️';
+      } else {
+        previewAudio.pause();
+        previewAudio.currentTime = 0;
+        previewPlayIcon.textContent = '▶️';
+      }
+    });
+
+    // Handle preview audio end
+    previewAudio.addEventListener('ended', function() {
+      previewPlayIcon.textContent = '▶️';
+    });
+
+    // Handle reference file upload
+    referenceFile.addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      await uploadFile(file);
+    });
+
+    // Handle recorded audio upload
+    async function uploadRecordedAudio() {
+      if (!recordedBlob) {
+        showToast('No recorded audio to upload', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'audio/webm'
+          },
+          body: recordedBlob
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        uploadedReferenceFile = data.filename;
+        showToast('Voice recording uploaded successfully!', 'success');
+        resetRecording();
+        // Reload voices and auto-select the newly uploaded voice
+        loadVoices(modelSelect.value, data.filename);
+      } catch (error) {
+        console.error('Upload failed:', error);
+        showToast('Failed to upload recorded audio: ' + error.message, 'error');
+      }
+    }
+
+    async function uploadFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        uploadedReferenceFile = data.filename;
+        showToast('Voice file uploaded successfully!', 'success');
+        // Reload voices and auto-select the newly uploaded voice
+        loadVoices(modelSelect.value, data.filename);
+      } catch (error) {
+        console.error('Upload failed:', error);
+        showToast('Failed to upload reference audio: ' + error.message, 'error');
+      }
+    }
+
+    // Update character count
+    textInput.addEventListener('input', function() {
+      charCount.textContent = this.value.length + ' characters';
+    });
+
+    // Generate audio
+    generateBtn.addEventListener('click', async function() {
+      const model = modelSelect.value;
+      const voice = voiceSelect.value;
+      const text = textInput.value.trim();
+
+      if (!model) {
+        showToast('Please select a model', 'warning');
+        return;
+      }
+
+      if (!text) {
+        showToast('Please enter some text', 'warning');
+        return;
+      }
+
+      // Check if reference file is needed
+      const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+      const requiresReference = selectedOption.getAttribute('data-requires-reference') === 'true' ||
+                               selectedOption.getAttribute('data-requires-reference') === 'True';
+
+      if (requiresReference && !uploadedReferenceFile) {
+        showToast('Please upload a reference audio file for voice cloning', 'warning');
+        return;
+      }
+
+      // Disable button and show loading
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ Generating...';
+
+      try {
+        const payload = {
+          model: model,
+          voice: voice,
+          text: text
+        };
+
+        if (uploadedReferenceFile) {
+          payload.reference_file = uploadedReferenceFile;
+        }
+
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Show audio player
+        audioPlayer.src = data.audio_url;
+        downloadLink.href = data.audio_url;
+        generationInfo.textContent = `Generated with ${data.model}${data.voice ? ` (${data.voice})` : ''}`;
+
+        // Show performance info
+        if (data.generation_time && data.audio_duration) {
+          performanceInfo.textContent = `⏱️ ${data.generation_time}s generation time • 🎵 ${data.audio_duration}s audio duration`;
+        }
+
+        // Show GPU info
+        if (data.gpu_usage) {
+          let gpuText = '';
+          if (data.gpu_usage.cuda && data.gpu_usage.cuda.length > 0) {
+            const gpu = data.gpu_usage.cuda[0];
+            gpuText = `🖥️ GPU: ${gpu.memory_allocated_gb.toFixed(1)}GB used`;
+          } else if (data.gpu_usage.mps) {
+            gpuText = '🍎 MPS: Active';
+          } else {
+            gpuText = '💻 CPU: Active';
+          }
+          gpuInfo.textContent = gpuText;
+        }
+
+        audioSection.style.display = 'block';
+
+        // Auto-play
+        audioPlayer.play();
+
+      } catch (error) {
+        console.error('Generation failed:', error);
+        showToast('Failed to generate audio: ' + error.message, 'error');
+      } finally {
+        // Re-enable button
+        generateBtn.disabled = false;
+        generateBtn.textContent = '🎵 Generate Audio';
+      }
+    });
+
+    // Device info modal
+    deviceInfoBtn.addEventListener('click', showDeviceInfo);
+    closeModal.addEventListener('click', hideDeviceInfo);
+    deviceModal.addEventListener('click', function(e) {
+      if (e.target === deviceModal) {
+        hideDeviceInfo();
+      }
+    });
+
+    async function showDeviceInfo() {
+      deviceModal.classList.remove('hidden');
+      deviceDetails.innerHTML = '<div class="animate-pulse text-center text-gray-500">Loading device information...</div>';
+
+      try {
+        const response = await fetch('/api/device-info');
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Build device info display
+        let html = '';
+
+        // System info
+        const deviceInfo = data.device_info;
+        html += `
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-blue-800 mb-2">System Information</h4>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div><strong>Platform:</strong> ${deviceInfo.platform}</div>
+              <div><strong>CPU Cores:</strong> ${deviceInfo.cpu_count} (${deviceInfo.cpu_count_logical} logical)</div>
+              <div><strong>Memory:</strong> ${(deviceInfo.memory_total_gb).toFixed(1)} GB total</div>
+              <div><strong>PyTorch:</strong> ${deviceInfo.torch_version}</div>
+            </div>
+          </div>
+        `;
+
+        // GPU info
+        if (deviceInfo.cuda_available || deviceInfo.mps_available) {
+          html += '<div class="bg-green-50 p-4 rounded-lg mt-4"><h4 class="font-semibold text-green-800 mb-2">GPU Information</h4>';
+
+          if (deviceInfo.cuda_available) {
+            html += `<div class="mb-2"><strong>🎮 CUDA GPUs:</strong> ${deviceInfo.cuda_device_count} available</div>`;
+            if (deviceInfo.cuda_devices) {
+              deviceInfo.cuda_devices.forEach((gpu, i) => {
+                html += `
+                  <div class="ml-4 text-sm bg-white p-2 rounded border mb-2">
+                    <div><strong>GPU ${i}:</strong> ${gpu.name}</div>
+                    <div><strong>Memory:</strong> ${(gpu.total_memory_gb).toFixed(1)} GB</div>
+                    <div><strong>Compute Capability:</strong> ${gpu.major}.${gpu.minor}</div>
+                  </div>
+                `;
+              });
+            }
+          }
+
+          if (deviceInfo.mps_available) {
+            html += '<div class="mb-2"><strong>🍎 Apple Silicon MPS:</strong> Available</div>';
+          }
+
+          html += `<div class="mt-2"><strong>Default Device:</strong> ${deviceInfo.default_device_name}</div>`;
+          html += '</div>';
+        } else {
+          html += `
+            <div class="bg-yellow-50 p-4 rounded-lg mt-4">
+              <h4 class="font-semibold text-yellow-800 mb-2">⚠️ No GPU Detected</h4>
+              <p class="text-sm text-yellow-700">Currently using CPU for all computations. GPU acceleration may improve performance.</p>
+            </div>
+          `;
+        }
+
+        // Current GPU usage
+        const gpuUsage = data.gpu_usage;
+        if (gpuUsage && (gpuUsage.cuda || gpuUsage.mps)) {
+          html += '<div class="bg-purple-50 p-4 rounded-lg mt-4"><h4 class="font-semibold text-purple-800 mb-2">Current GPU Usage</h4>';
+
+          if (gpuUsage.cuda && gpuUsage.cuda.length > 0) {
+            gpuUsage.cuda.forEach((gpu, i) => {
+              html += `
+                <div class="bg-white p-3 rounded border mb-2">
+                  <div class="font-medium">GPU ${i}: ${gpu.name}</div>
+                  <div class="grid grid-cols-3 gap-4 text-sm mt-1">
+                    <div>Allocated: ${gpu.memory_allocated_gb} GB</div>
+                    <div>Reserved: ${gpu.memory_reserved_gb} GB</div>
+                    <div>Free: ${gpu.memory_free_gb} GB</div>
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          if (gpuUsage.mps) {
+            html += '<div class="text-sm">🍎 Apple Silicon MPS is active</div>';
+          }
+
+          html += '</div>';
+        }
+
+        deviceDetails.innerHTML = html;
+
+      } catch (error) {
+        console.error('Failed to load device info:', error);
+        deviceDetails.innerHTML = `
+          <div class="bg-red-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-red-800 mb-2">Error Loading Device Information</h4>
+            <p class="text-red-700">${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function hideDeviceInfo() {
+      deviceModal.classList.add('hidden');
+    }
+
+    // Random text generation functionality
+    const wordBanks = {
+      adjective: [
+        'beautiful', 'brilliant', 'charming', 'delightful', 'elegant', 'fascinating', 'graceful', 'harmonious',
+        'intelligent', 'joyful', 'kind', 'lively', 'magnificent', 'noble', 'optimistic', 'peaceful',
+        'quick', 'radiant', 'splendid', 'thoughtful', 'unique', 'vibrant', 'wise', 'youthful', 'zealous'
+      ],
+      noun: [
+        'adventure', 'beauty', 'courage', 'dream', 'energy', 'freedom', 'garden', 'harmony', 'inspiration',
+        'journey', 'knowledge', 'light', 'music', 'nature', 'ocean', 'peace', 'quest', 'river', 'sunshine',
+        'tree', 'universe', 'victory', 'wisdom', 'xenon', 'youth', 'zenith'
+      ],
+      verb: [
+        'admire', 'build', 'create', 'dance', 'explore', 'fly', 'grow', 'help', 'imagine', 'journey',
+        'kindle', 'learn', 'move', 'nurture', 'open', 'play', 'question', 'reach', 'sing', 'travel',
+        'understand', 'venture', 'welcome', 'xylophone', 'yield', 'zoom'
+      ],
+      adverb: [
+        'beautifully', 'brilliantly', 'carefully', 'delightfully', 'eagerly', 'faithfully', 'gracefully',
+        'happily', 'intensely', 'joyfully', 'kindly', 'lovingly', 'majestically', 'naturally', 'optimistically',
+        'peacefully', 'quickly', 'radiantly', 'silently', 'thoughtfully', 'uniquely', 'vibrantly', 'warmly'
+      ],
+      character: [
+        'Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Avery', 'Quinn', 'Skyler', 'Reese',
+        'Jamie', 'Robin', 'Sage', 'River', 'Phoenix', 'Rowan', 'Ellis', 'Finley', 'Harper', 'Logan'
+      ]
+    };
+
+    const sentenceTemplates = [
+      'The {adjective} {noun} {verb} {adverb} through the {noun}.',
+      'I {verb} to {verb} the {adjective} {noun} with {noun}.',
+      'The {noun} {verb} {adverb} as the {adjective} {noun} {verb}.',
+      'We {verb} the {adjective} {noun} and {verb} {adverb}.',
+      'She {verb} {adverb} to the {adjective} {noun} in the {noun}.',
+      'They {verb} the {noun} {adverb} with {adjective} {noun}.',
+      'He {verb} {adverb} when he saw the {adjective} {noun}.',
+      'The {adjective} {noun} {verb} {adverb} in the {noun}.',
+      'I love how the {adjective} {noun} {verb} {adverb}.',
+      'The {noun} {verb} {adverb} through the {adjective} {noun}.'
+    ];
+
+    const dialogTemplates = [
+      ['Hello! How are you today?', 'I\'m doing well, thank you! And you?', 'Wonderful! The weather is {adjective} today.'],
+      ['What did you think of that {noun}?', 'It was quite {adjective}! I especially liked how it {verb} {adverb}.', 'Yes, the {noun} really made it special.'],
+      ['Have you seen the new {noun}?', 'Not yet, but I\'ve heard it\'s {adjective}.', 'You should {verb} it {adverb}! It\'s amazing.'],
+      ['I love {verb} {adverb} in the {noun}.', 'That sounds {adjective}! Maybe we can go together sometime.', 'Absolutely! The {noun} is always so peaceful.'],
+      ['Did you {verb} about the {adjective} {noun}?', 'Yes! It {verb} {adverb} through the {noun}.', 'I can\'t wait to see it in person.']
+    ];
+
+    const storyTemplates = [
+      {
+        title: 'The {adjective} Discovery',
+        paragraphs: [
+          'In a {adjective} village nestled between rolling hills, lived a young {character} who spent their days {verb} {adverb}. {character} had always been fascinated by the mysteries of the {noun}, and dreamed of one day uncovering its secrets.',
+          'One morning, while {verb} through the {adjective} forest, {character} stumbled upon an ancient {noun} hidden beneath a canopy of {noun}. The object pulsed with an otherworldly {noun}, and {character} felt drawn to {verb} it {adverb}.',
+          '"This could change everything," {character} whispered, their heart racing with excitement. As they reached out to touch the {noun}, a soft voice echoed through the trees, revealing secrets that would transform their understanding of the {noun} forever.',
+          'From that day forward, {character} became known as the guardian of the {adjective} {noun}, using their newfound knowledge to {verb} others and {verb} the {noun} of their community. The discovery had not only changed {character}\'s life, but had brought {noun} and {noun} to everyone they encountered.'
+        ]
+      },
+      {
+        title: 'Journey to the {adjective} {noun}',
+        paragraphs: [
+          '{character} had always been a dreamer, spending countless hours gazing at the stars and wondering about the vast {noun} beyond their small town. Their {adjective} curiosity led them to {verb} ancient maps and study the legends of the {noun}.',
+          'The turning point came when {character} discovered an old {noun} in their grandmother\'s attic. The {adjective} artifact seemed to {verb} with a life of its own, and {character} knew this was the sign they had been waiting for. "It\'s time to {verb} my destiny," they declared.',
+          'The journey was filled with challenges. {character} had to {verb} through {adjective} terrains, {verb} with unexpected obstacles, and {verb} their own fears. Along the way, they met a wise {character} who taught them the importance of {noun} and {noun}.',
+          'Finally reaching the legendary {noun}, {character} discovered that the true treasure was not gold or jewels, but the {noun} they had gained along the way. Returning home transformed, {character} shared their wisdom with others, inspiring a new generation to {verb} their own dreams.'
+        ]
+      },
+      {
+        title: 'The {character} and the {adjective} {noun}',
+        paragraphs: [
+          'Deep in the heart of an enchanted forest stood a {adjective} {noun} that had stood for centuries. Local legends spoke of its magical properties and the {character} who had once guarded it. No one knew if the stories were true, but everyone respected the {noun}\'s power.',
+          'One stormy night, a young {character} named {character} found themselves lost in the forest. Seeking shelter from the {adjective} rain, they approached the ancient {noun}. To their astonishment, the structure seemed to {verb} with an inner light, welcoming them inside.',
+          'Inside, {character} discovered rooms filled with {adjective} artifacts and glowing {noun}. A mysterious voice explained that the {noun} chose its guardians carefully, testing them through trials of {noun} and {noun}. {character} had to {verb} {adverb} to prove their worth.',
+          'Having passed the tests, {character} became the new guardian of the {adjective} {noun}. They learned to {verb} the forest\'s magic and {verb} harmony between the natural world and human {noun}. The experience taught them that true power comes from {noun} and {adjective} wisdom.'
+        ]
+      }
+    ];
+
+    function getRandomElement(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function generateSentence() {
+      let template = getRandomElement(sentenceTemplates);
+      let sentence = template;
+
+      // Replace placeholders with random words
+      Object.keys(wordBanks).forEach(category => {
+        const regex = new RegExp(`{${category}}`, 'g');
+        sentence = sentence.replace(regex, () => getRandomElement(wordBanks[category]));
+      });
+
+      return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+    }
+
+    function generateParagraph() {
+      const numSentences = Math.floor(Math.random() * 3) + 3; // 3-5 sentences
+      const sentences = [];
+
+      for (let i = 0; i < numSentences; i++) {
+        sentences.push(generateSentence());
+      }
+
+      return sentences.join(' ');
+    }
+
+    function generateDialog() {
+      const template = getRandomElement(dialogTemplates);
+      const dialog = [];
+
+      template.forEach(line => {
+        let processedLine = line;
+
+        // Replace placeholders with random words
+        Object.keys(wordBanks).forEach(category => {
+          const regex = new RegExp(`{${category}}`, 'g');
+          processedLine = processedLine.replace(regex, () => getRandomElement(wordBanks[category]));
+        });
+
+        dialog.push(processedLine);
+      });
+
+      return dialog.join('\n\n');
+    }
+
+    function generateStory() {
+      const template = getRandomElement(storyTemplates);
+      const story = [];
+
+      // Add title
+      let title = template.title;
+      Object.keys(wordBanks).forEach(category => {
+        const regex = new RegExp(`{${category}}`, 'g');
+        title = title.replace(regex, () => getRandomElement(wordBanks[category]));
+      });
+      story.push(title);
+      story.push(''); // Empty line after title
+
+      // Add paragraphs
+      template.paragraphs.forEach(paragraph => {
+        let processedParagraph = paragraph;
+
+        // Replace placeholders with random words
+        Object.keys(wordBanks).forEach(category => {
+          const regex = new RegExp(`{${category}}`, 'g');
+          processedParagraph = processedParagraph.replace(regex, () => getRandomElement(wordBanks[category]));
+        });
+
+        story.push(processedParagraph);
+        story.push(''); // Empty line between paragraphs
+      });
+
+      return story.join('\n').trim();
+    }
+
+    function generateRandomText(type) {
+      switch (type) {
+        case 'sentence':
+          return generateSentence();
+        case 'paragraph':
+          return generateParagraph();
+        case 'dialog':
+          return generateDialog();
+        case 'story':
+          return generateStory();
+        default:
+          return generateSentence();
+      }
+    }
+
+    // Random text button event listener
+    randomTextBtn.addEventListener('click', function() {
+      const textType = textTypeSelect.value;
+      const randomText = generateRandomText(textType);
+
+      textInput.value = randomText;
+      textInput.dispatchEvent(new Event('input')); // Trigger character count update
+
+      showToast(`Generated random ${textType}!`, 'success', 2000);
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load voices for default model if any
+      if (modelSelect.value) {
+        loadVoices();
+      }
+    });
+  </script>
+</body>
+</html>
